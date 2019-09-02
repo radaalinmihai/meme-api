@@ -54,6 +54,8 @@ class UserController extends Controller
     {
         $http = new Client;
         $response = $http->post(url('/oauth/token'), [
+            'allow_redirects' => true,
+            'http_errors' => false,
             'form_params' => [
                 'grant_type' => 'password',
                 'client_id' => env('OAUTH_PASSWORD_CLIENT_ID'),
@@ -63,7 +65,7 @@ class UserController extends Controller
                 'scope' => '*',
             ]
         ]);
-        return json_decode((string) $response, true);
+        return json_decode((string) $response->getBody(), true);
     }
     /**
      * details api
