@@ -72,6 +72,10 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function checkToken()
+    {
+        return response()->json(['success' => true], $this->successStatus);
+    }
     public function details()
     {
         $user = Auth::user();
