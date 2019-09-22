@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 
 Route::post('login', 'UserController@login');
 Route::post('register', 'UserController@register');
+Route::post('refreshToken', 'UserController@refreshToken');
 Route::group(['middleware' => 'auth:api'], function() {
     Route::post('details', 'UserController@details');
     Route::post('checkToken', 'UserController@checkToken');

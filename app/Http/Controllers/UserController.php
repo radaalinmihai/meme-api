@@ -54,7 +54,7 @@ class UserController extends Controller
     {
         $http = new Client;
         $response = $http->post(url('/oauth/token'), [
-            'allow_redirects' => true,
+            'allow_redirects' => false,
             'http_errors' => false,
             'form_params' => [
                 'grant_type' => 'password',
@@ -65,6 +65,26 @@ class UserController extends Controller
                 'scope' => '*',
             ]
         ]);
+        return json_decode((string) $response->getBody(), true);
+    }
+    public function refreshToken(Request $request)
+    {
+        $refresh_token = $this->generateRefreshToken($request->bearerToken());
+        return response()->json(['token' => $refresh_token], $this->successStatus);
+    }
+    private function generateRefreshToken($refreshToken)
+    {
+        $http = new Client;
+        $response = $http->post(url('/oauth/token'), [
+            'form_params' => [
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $refreshToken,
+                'client_id' => env('OAUTH_PASSWORD_CLIENT_ID'),
+                'client_secret' => env('OAUTH_PASSWORD_CLIENT_SECRET'),
+                'scope' => '*',
+            ]
+        ]);
+
         return json_decode((string) $response->getBody(), true);
     }
     /**
