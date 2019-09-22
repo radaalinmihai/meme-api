@@ -34,12 +34,13 @@ class UserController extends Controller
      */
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'username' => 'required',
             'email' => 'required|email',
             'password' => 'required',
             'c_password' => 'required|same:password',
-        ]);
+        ];
+        $validator = $this->validate($request, $rules);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 401);
         }
@@ -47,7 +48,6 @@ class UserController extends Controller
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
         $success['token'] =  $this->generateToken($user->email, $request->password);
-        $success['username'] =  $user->username;
         return response()->json(['success' => $success], $this->successStatus);
     }
     private function generateToken($username, $password)
@@ -100,5 +100,12 @@ class UserController extends Controller
     {
         $user = Auth::user();
         return response()->json(['success' => $user], $this->successStatus);
+    }
+    public function logout()
+    {
+        if(Auth::check()) {
+            Auth::user()->AauthAccessToken()->delete();
+            return response()->json(['success' => 'Logged out succesfuly'], $this->successStatus);
+        }
     }
 }

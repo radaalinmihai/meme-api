@@ -19,4 +19,5 @@ Route::post('refreshToken', 'UserController@refreshToken');
 Route::group(['middleware' => 'auth:api'], function() {
     Route::post('details', 'UserController@details');
     Route::post('checkToken', 'UserController@checkToken');
+    Route::post('logout', 'UserController@logout');
 });
