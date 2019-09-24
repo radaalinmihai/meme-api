@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
-use Validator;
 
 class UserController extends Controller
 {
@@ -19,6 +18,11 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
+        $rules = [
+            'username' => 'required',
+            'password' => 'required',
+        ];
+        $this->validate($request, $rules);
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = Auth::user();
             $success['token'] =  $this->generateToken($user->email, $request->password);
@@ -40,14 +44,13 @@ class UserController extends Controller
             'password' => 'required',
             'c_password' => 'required|same:password',
         ];
-        $validator = $this->validate($request, $rules);
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 401);
-        }
+        
+        $this->validate($request, $rules);
+
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
-        $success['token'] =  $this->generateToken($user->email, $request->password);
+        $success['token'] = $this->generateToken($user->email, $request->password);
         return response()->json(['success' => $success], $this->successStatus);
     }
     private function generateToken($username, $password)
