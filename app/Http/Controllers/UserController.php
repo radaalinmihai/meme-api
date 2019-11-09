@@ -28,7 +28,7 @@ class UserController extends Controller
             $success['token'] =  $this->generateToken($user->email, $request->password);
             return response()->json(['success' => $success], $this->successStatus);
         } else {
-            return response()->json(['error' => 'Unauthorised'], 401);
+            return response()->json(['error' => 'Username and password don\'t match.'], 401);
         }
     }
     /**
