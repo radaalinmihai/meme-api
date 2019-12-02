@@ -1,0 +1,7 @@
+[02-Dec-2019 00:32:28 Europe/Vilnius] PHP Warning:  require(/var/home/ratenews/public_html/vendor/autoload.php): failed to open stream: No such file or directory in /var/home/ratenews/public_html/artisan on line 18
+[02-Dec-2019 00:32:28 Europe/Vilnius] PHP Warning:  require(/var/home/ratenews/public_html/vendor/autoload.php): failed to open stream: No such file or directory in /var/home/ratenews/public_html/artisan on line 18
+[02-Dec-2019 00:32:28 Europe/Vilnius] PHP Fatal error:  require(): Failed opening required '/var/home/ratenews/public_html/vendor/autoload.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /var/home/ratenews/public_html/artisan on line 18
+[02-Dec-2019 00:43:22 Europe/Vilnius] PHP Warning:  require(/var/home/ratenews/public_html/vendor/autoload.php): failed to open stream: No such file or directory in /var/home/ratenews/public_html/artisan on line 18
+[02-Dec-2019 00:43:22 Europe/Vilnius] PHP Warning:  require(/var/home/ratenews/public_html/vendor/autoload.php): failed to open stream: No such file or directory in /var/home/ratenews/public_html/artisan on line 18
+[02-Dec-2019 00:43:22 Europe/Vilnius] PHP Fatal error:  require(): Failed opening required '/var/home/ratenews/public_html/vendor/autoload.php' (include_path='.:/opt/alt/php72/usr/share/pear') in /var/home/ratenews/public_html/artisan on line 18
+[02-Dec-2019 11:34:37 Europe/Vilnius] PHP Warning:  Use of undefined constant InnoDB - assumed 'InnoDB' (this will throw an Error in a future version of PHP) in /var/home/ratenews/public_html/config/database.php on line 60
