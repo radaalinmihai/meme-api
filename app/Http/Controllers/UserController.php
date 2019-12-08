@@ -72,7 +72,7 @@ class UserController extends Controller
     }
     public function refreshToken(Request $request)
     {
-        $refresh_token = $this->generateRefreshToken($request->bearerToken());
+        $refresh_token = $this->generateRefreshToken($request->refresh_token);
         return response()->json(['token' => $refresh_token], $this->successStatus);
     }
     private function generateRefreshToken($refreshToken)
@@ -107,7 +107,7 @@ class UserController extends Controller
     public function logout()
     {
         if(Auth::check()) {
-            Auth::user()->AauthAccessToken()->delete();
+            Auth::user()->token()->revoke();
             return response()->json(['success' => 'Logged out succesfuly'], $this->successStatus);
         }
     }

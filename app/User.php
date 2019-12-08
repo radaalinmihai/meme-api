@@ -30,4 +30,9 @@ class User extends Authenticatable
   {
     return $this->hasMany('\App\OauthAccessToken');
   }
+
+  public function AuthRefreshToken()
+  {
+    return $this->hasMany('\App\OauthRefreshToken');
+  }
 }
