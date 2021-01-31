@@ -42,18 +42,57 @@ func Handler(c *gin.Context) {
 		return
 	}
 
-	sql := "INSERT INTO users(username, email, password) VALUES(?, ?, ?)"
-	res, err := db.MemeDB.Exec(sql, newUser.Username, newUser.Email, hashedPassword)
+	tx, err := db.MemeDB.Begin()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": "FAILED_INSERTION",
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"code": "INTERNAL_ERROR",
+			"errors": err.Error(),
 		})
-		panic(err.Error())
 		return
 	}
 
-	rowsAffected, _ := res.RowsAffected()
-	fmt.Println(rowsAffected)
+	{
+		tx.QueryRow("SET @uuid=uuid()")
+		sql := `
+			INSERT INTO users(id, username, password, email)
+			VALUES(@uuid, ?, ?, ?)
+		`
+		if _, err := tx.Exec(sql, newUser.Username, hashedPassword, newUser.Email); err != nil {
+			_ = tx.Rollback()
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": "INTERNAL_ERROR",
+				"errors": err.Error(),
+			})
+			return
+		}
+
+	}
+
+	{
+		sql := `
+			INSERT INTO profiles(userId)
+			VALUES(@uuid)
+		`
+		if _, err := tx.Exec(sql); err != nil {
+			tx.Rollback()
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": "INTERNAL_ERROR",
+				"errors": err.Error(),
+			})
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		fmt.Print(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"code": "INTERNAL_ERROR",
+			"errors": err.Error(),
+		})
+		return
+	}
+
 
 	accessToken, refreshToken, err := helpers.CreateToken(newUser.Username)
 	if err != nil {

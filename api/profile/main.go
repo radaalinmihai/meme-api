@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"meme/db"
@@ -9,7 +10,15 @@ import (
 	"strings"
 )
 
-func Handler(c *gin.Context) {
+type Profile struct {
+	Id        int
+	UserId    sql.NullString `json:"userId "db:"userId"`
+	Avatar    sql.NullString `json:"avatar" db:"avatar"`
+	FirstName sql.NullString `json:"firstName" db:"firstName"`
+	LastName  sql.NullString `json:"lastName" db:"lastName"`
+}
+
+func GetProfile(c *gin.Context) {
 	headerToken := c.Request.Header.Get("Authorization")
 	token := strings.Split(headerToken, "Bearer ")
 	tokenClaims, err := helpers.ParseToken(token[1])
@@ -21,23 +30,55 @@ func Handler(c *gin.Context) {
 		return
 	}
 
-	sql := "SELECT * from users WHERE username=?"
-	queryUser := db.MemeDB.QueryRow(sql, tokenClaims["username"])
+	sql := `
+		SELECT avatar, firstName, lastName FROM profiles
+		RIGHT JOIN users u ON profiles.userId=u.id
+		WHERE username=?
+	`
+	profile := Profile{}
+	if err := db.MemeDB.Get(&profile, sql, tokenClaims["username"]); err != nil {
+		fmt.Println(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":  "NO_PROFILE",
+			"error": err.Error(),
+		})
+		return
+	}
 
-	var (
-		username string
-		email    string
-	)
-
-	_ = queryUser.Scan(&username, &email)
-	fmt.Print(queryUser.Err())
-
-	fmt.Printf("Email: %s", email)
 	c.JSON(http.StatusOK, gin.H{
 		"code": "OK",
 		"profile": gin.H{
-			"username": username,
-			"email":    email,
+			"avatar":    profile.Avatar.String,
+			"firstName": profile.FirstName.String,
+			"lastName":  profile.LastName.String,
 		},
+	})
+}
+
+func UpdateProfile(c *gin.Context) {
+	profile := Profile{}
+	profileId := c.Param("id")
+
+	if err := c.ShouldBindJSON(&profile); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	sql := "UPDATE profiles SET avatar=?, firstName=?, lastName=? WHERE id=?"
+
+	_, err := db.MemeDB.Exec(sql, profile.Avatar.String, profile.FirstName.String, profile.LastName.String, profileId)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"code": "SOMETHING_HAPPENED",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	fmt.Println(profile)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": "OK",
 	})
 }

@@ -1,2 +1,3 @@
+DROP TABLE IF EXISTS post_cards;
 DROP TABLE IF EXISTS profiles;
 DROP TABLE IF EXISTS users;

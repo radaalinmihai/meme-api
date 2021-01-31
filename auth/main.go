@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		accessTokenBearer := c.Request.Header.Get("Authorization")
 
@@ -33,7 +33,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		expireTime, _ := time.Parse(time.RFC3339, accessTokenClaims["expire"].(string))
 
 		if isTokenExpired := (expireTime.Unix() - time.Now().Unix()) < 0; isTokenExpired {
-			c.JSON(http.StatusForbidden, gin.H{
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"code": "SESSION_EXPIRED",
 			})
 			return

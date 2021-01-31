@@ -21,13 +21,15 @@ func main() {
 	r := gin.New()
 
 	api := r.Group("/api")
+
 	auth := api.Group("/auth")
 	auth.POST("/login", login.Handler)
 	auth.POST("/register", register.Handler)
 	auth.GET("/refreshToken", helpers.RefreshToken)
 
-	api.Use(memeAuth.AuthMiddleware())
-	api.GET("/profile", profile.Handler)
+	api.Use(memeAuth.Middleware())
+	api.GET("/profile", profile.GetProfile)
+	api.PUT("/profile/:id", profile.UpdateProfile)
 
 	_ = r.Run(":4000")
 }
