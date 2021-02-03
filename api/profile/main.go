@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"meme/db"
@@ -12,10 +11,10 @@ import (
 
 type Profile struct {
 	Id        int
-	UserId    sql.NullString `json:"userId "db:"userId"`
-	Avatar    sql.NullString `json:"avatar" db:"avatar"`
-	FirstName sql.NullString `json:"firstName" db:"firstName"`
-	LastName  sql.NullString `json:"lastName" db:"lastName"`
+	UserId    db.NullString `json:"userId "db:"userId"`
+	Avatar    db.NullString `json:"avatar" db:"avatar"`
+	FirstName db.NullString `json:"firstName" db:"firstName"`
+	LastName  db.NullString `json:"lastName" db:"lastName"`
 }
 
 func GetProfile(c *gin.Context) {
@@ -76,7 +75,7 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(profile)
+	fmt.Println(profile.Id)
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": "OK",
