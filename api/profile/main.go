@@ -11,10 +11,10 @@ import (
 
 type Profile struct {
 	Id        int
-	UserId    db.NullString `json:"userId "db:"userId"`
-	Avatar    db.NullString `json:"avatar" db:"avatar"`
-	FirstName db.NullString `json:"firstName" db:"firstName"`
-	LastName  db.NullString `json:"lastName" db:"lastName"`
+	UserId    string `json:"userId" db:"userId"`
+	Avatar    string `json:"avatar" db:"avatar"`
+	FirstName string `json:"firstName" db:"firstName"`
+	LastName  string `json:"lastName" db:"lastName"`
 }
 
 func GetProfile(c *gin.Context) {
@@ -47,9 +47,9 @@ func GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": "OK",
 		"profile": gin.H{
-			"avatar":    profile.Avatar.String,
-			"firstName": profile.FirstName.String,
-			"lastName":  profile.LastName.String,
+			"avatar":    profile.Avatar,
+			"firstName": profile.FirstName,
+			"lastName":  profile.LastName,
 		},
 	})
 }
@@ -65,7 +65,7 @@ func UpdateProfile(c *gin.Context) {
 
 	sql := "UPDATE profiles SET avatar=?, firstName=?, lastName=? WHERE id=?"
 
-	_, err := db.MemeDB.Exec(sql, profile.Avatar.String, profile.FirstName.String, profile.LastName.String, profileId)
+	_, err := db.MemeDB.Exec(sql, profile.Avatar, profile.FirstName, profile.LastName, profileId)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

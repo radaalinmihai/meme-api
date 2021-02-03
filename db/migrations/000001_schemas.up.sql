@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS profiles
     CONSTRAINT `fkProfileId`
         FOREIGN KEY (userId)
             REFERENCES users (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    avatar    varchar(128) DEFAULT NULL,
-    firstName varchar(100) DEFAULT NULL,
-    lastName  varchar(100) DEFAULT NULL
+    avatar    varchar(128) DEFAULT('') NOT NULL,
+    firstName varchar(100) DEFAULT('') NOT NULL,
+    lastName  varchar(100) DEFAULT('') NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS post_cards
