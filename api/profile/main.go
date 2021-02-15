@@ -69,7 +69,7 @@ func UpdateProfile(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"code": "SOMETHING_HAPPENED",
+			"code": "INTERNAL_ERROR",
 			"message": err.Error(),
 		})
 		return

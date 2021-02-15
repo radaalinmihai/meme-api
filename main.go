@@ -18,7 +18,7 @@ func main() {
 		log.Fatal("Error loading .env file :(")
 	}
 	db.ConnectDB()
-	r := gin.New()
+	r := gin.Default()
 
 	api := r.Group("/api")
 

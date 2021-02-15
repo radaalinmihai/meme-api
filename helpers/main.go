@@ -76,9 +76,9 @@ func RefreshToken(c *gin.Context) {
 	}
 
 	refreshTokenExpire, _ := time.Parse(time.RFC3339, refreshTokenClaims["expire"].(string))
-	ellapsedTime := refreshTokenExpire.Unix() - time.Now().Unix()
+	elapsedTime := refreshTokenExpire.Unix() - time.Now().Unix()
 
-	if ellapsedTime < 0 {
+	if elapsedTime < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": "REFRESH_TOKEN_EXPIRED",
 			"message": "Ceva nu a mers bine, te rugam sa te loghezi din nou",
