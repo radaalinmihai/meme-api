@@ -28,8 +28,8 @@ func main() {
 	auth.GET("/refreshToken", helpers.RefreshToken)
 
 	api.Use(memeAuth.Middleware())
-	api.GET("/profile", profile.GetProfile)
-	api.PUT("/profile/:id", profile.UpdateProfile)
+	api.GET("/profile", profile.Get)
+	api.PUT("/profile/:id", profile.Update)
 
 	_ = r.Run(":4000")
 }
