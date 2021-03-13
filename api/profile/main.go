@@ -68,8 +68,14 @@ func Get(c *gin.Context) {
 	})
 }
 
+type profileUpdate struct {
+	LastName  db.NullString `json:"lastName"`
+	FirstName db.NullString `json:"firstName"`
+	Avatar    db.NullString `json:"avatar"`
+}
+
 func Update(c *gin.Context) {
-	profile := Profile{}
+	profile := profileUpdate{}
 	profileId := c.Param("id")
 
 	if err := c.ShouldBindJSON(&profile); err != nil {
@@ -77,9 +83,20 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	sql := "UPDATE profiles SET avatar=?, firstName=?, lastName=? WHERE id=?"
+	var query string
+	var err error
 
-	_, err := db.MemeDB.Exec(sql, profile.Avatar, profile.FirstName, profile.LastName, profileId)
+	if profile.FirstName.Valid && !profile.Avatar.Valid && !profile.LastName.Valid {
+		query = "UPDATE profiles SET firstName=? WHERE id=?"
+		_, err = db.MemeDB.Exec(query, profile.FirstName, profileId)
+	} else if !profile.FirstName.Valid && profile.Avatar.Valid && !profile.LastName.Valid {
+		query = "UPDATE profiles SET avatar=? WHERE id=?"
+		_, err = db.MemeDB.Exec(query, profile.Avatar, profileId)
+	} else if !profile.FirstName.Valid && !profile.Avatar.Valid && profile.LastName.Valid {
+		query = "UPDATE profiles SET lastName=? WHERE id=?"
+		_, err = db.MemeDB.Exec(query, profile.LastName, profileId)
+	}
+
 	if err != nil {
 		fmt.Println(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -88,8 +105,6 @@ func Update(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(profile.Id)
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": "OK",
