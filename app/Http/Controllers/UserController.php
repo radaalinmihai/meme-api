@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\User;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
 
 class UserController extends Controller
 {
-    public $successStatus = 200;
     /**
      * login api
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return string[]
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function login(Request $request)
+    public function login(Request $request): array
     {
         $rules = [
             'username' => 'required',
@@ -25,34 +26,14 @@ class UserController extends Controller
         $this->validate($request, $rules);
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = Auth::user();
-            $success['token'] =  $this->generateToken($user->email, $request->password);
-            return response()->json(['success' => $success], $this->successStatus);
+            $success = $this->generateToken($user->email, $request->password);
+            $success['code'] = 'OK';
+            return $success;
         } else {
-            return response()->json(['error' => 'Username and password don\'t match.'], 401);
+            return ['error' => 'Username and password don\'t match.'];
         }
     }
-    /**
-     * Register api
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function register(Request $request)
-    {
-        $rules = [
-            'username' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-            'c_password' => 'required|same:password',
-        ];
-        
-        $this->validate($request, $rules);
 
-        $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
-        $user = User::create($input);
-        $success['token'] = $this->generateToken($user->email, $request->password);
-        return response()->json(['success' => $success], $this->successStatus);
-    }
     private function generateToken($username, $password)
     {
         $http = new Client;
@@ -68,13 +49,41 @@ class UserController extends Controller
                 'scope' => '*',
             ]
         ]);
-        return json_decode((string) $response->getBody(), true);
+        return json_decode((string)$response->getBody(), true);
     }
-    public function refreshToken(Request $request)
+
+    /**
+     * Register api
+     *
+     * @param Request $request
+     * @return Response
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function register(Request $request): Response
+    {
+        $rules = [
+            'username' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+            'c_password' => 'required|same:password',
+        ];
+
+        $this->validate($request, $rules);
+
+        $input = $request->all();
+        $input['password'] = bcrypt($input['password']);
+        $user = User::create($input);
+        $success = $this->generateToken($user->email, $request->password);
+        $success['code'] = "OK";
+        return $success;
+    }
+
+    public function refreshToken(Request $request): array
     {
         $refresh_token = $this->generateRefreshToken($request->refresh_token);
-        return response()->json(['token' => $refresh_token], $this->successStatus);
+        return ['token' => $refresh_token];
     }
+
     private function generateRefreshToken($refreshToken)
     {
         $http = new Client;
@@ -88,27 +97,20 @@ class UserController extends Controller
             ]
         ]);
 
-        return json_decode((string) $response->getBody(), true);
+        return json_decode((string)$response->getBody(), true);
     }
-    /**
-     * details api
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function checkToken()
-    {
-        return response()->json(['success' => true], $this->successStatus);
-    }
-    public function details()
+
+    public function details(): array
     {
         $user = Auth::user();
-        return response()->json(['success' => $user], $this->successStatus);
+        return ['success' => $user];
     }
-    public function logout()
+
+    public function logout(): array
     {
-        if(Auth::check()) {
+        if (Auth::check()) {
             Auth::user()->token()->revoke();
-            return response()->json(['success' => 'Logged out succesfuly'], $this->successStatus);
+            return ['success' => 'Logged out succesfuly'];
         }
     }
 }

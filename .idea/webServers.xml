@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="2823b62c-c43e-4a11-a8ff-6d03a1a333ce" name="RPI" url="http://192.167.1.7">
+        <fileTransfer rootFolder="/var/www/html/meme-api" accessType="SFTP" host="192.168.1.7" port="22" sshConfigId="f23abc42-9fcf-4f1a-9062-fe9726b09b13" sshConfig="pi@192.168.1.7:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
